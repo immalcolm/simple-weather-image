@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Simple Weather App!</title>
+  </head>
+  <body>
+    <h1>Simple Weather App</h1>
+
+    <input type="text" id="cityInput" placeholder="Search for a City" />
+    <button id="searchBtn">Search</button>
+
+    <div id="weatherDetails"></div>
+    <img id="weatherGif" src="" alt="Weather Today!!" />
+
+    <script>
+      //define all the different API keys
+      const OPENWEATHER_API = "8ea49a70241b4c7ce4839766bcd9f267";
+      const GIPHY_API = "F4VkYSgZ5Iq3QLMa6qEvTL8wYbwBpiUw";
+      const UNSPLASH_API = "";
+      //retrieve weather using OpenWeatherMap API
+      const requestOptions = {
+        method: "GET",
+        redirect: "follow",
+      };
+
+      const weatherDetails = document.getElementById("weatherDetails");
+
+      //get user inputs
+      const cityInput = document.getElementById("cityInput");
+      const searchBtn = document.getElementById("searchBtn");
+
+      //get the weather UI
+      const weatherGif = document.getElementById("weatherGif");
+
+      //add event listener
+      //allow search only when user clicks on the search
+      searchBtn.addEventListener("click", getWeather);
+
+      async function getWeather() {
+        const city = cityInput.value; //get value of textbox
+        const weatherRes = await fetch(
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=8ea49a70241b4c7ce4839766bcd9f267`,
+          requestOptions
+        );
+        
+        const weatherData = await weatherRes.json();
+        
+        const description = weatherData.weather[0].description;
+        const temperature = weatherData.main.temp;
+        console.log(description);
+        //update interface
+        weatherDetails.innerHTML = `${description}, ${temperature}°C`;
+
+        //get the related Gif
+        getGif(description);
+      }
+
+      function getGif(description) {
+        const requestOptions = {
+          method: "GET",
+          redirect: "follow",
+        };
+
+        fetch(
+          `https://api.giphy.com/v1/gifs/search?api_key=${GIPHY_API}&q=${description}&limit=1`,
+          requestOptions
+        )
+          .then((response) => response.json())
+          .then((result) => {
+            weatherGif.src = result.data[0].images.original.url
+          })
+          .catch((error) => console.error(error));
+      }
+      getGif("rain"); //call the function to get the gif
+
+      //retrieve a matching Gif via Giphy API
+    </script>
+  </body>
+</html>
